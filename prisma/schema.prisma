@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Urgency {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum Status {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+}
+
+enum Category {
+  TASK
+  BUY
+  GOAL
+}
+
+enum StatusInvite {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  username  String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  objectives      Objective[]
+  ObjectiveInvite ObjectiveInvite[]
+  Notification    Notification[]
+
+  @@map("users")
+}
+
+model Objective {
+  id            String    @id @default(uuid())
+  title         String
+  description   String
+  urgency       Urgency
+  status        Status
+  category      Category
+  dueDate       DateTime? @map("due_date")
+  completedDate DateTime? @map("completed_date")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  authorId      String    @map("author_id")
+
+  author          User              @relation(fields: [authorId], references: [id])
+  ObjectiveInvite ObjectiveInvite[]
+
+  @@map("objectives")
+}
+
+model ObjectiveInvite {
+  id             String       @id @default(uuid())
+  status         StatusInvite
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime?    @map("updated_at")
+  objectiveId    String
+  collaboratorId String
+
+  objective    Objective @relation(fields: [objectiveId], references: [id])
+  collaborator User      @relation(fields: [collaboratorId], references: [id])
+
+  @@map("objectives_invites")
+}
+
+model Notification {
+  id          String    @id @default(uuid())
+  title       String
+  content     String
+  readAt      DateTime? @map("read_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  recipientId String
+
+  recipient User @relation(fields: [recipientId], references: [id])
+
+  @@map("notifications")
+}
