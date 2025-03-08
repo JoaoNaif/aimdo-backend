@@ -29,7 +29,7 @@ describe('Delete User (E2E)', () => {
     await app.init()
   })
 
-  test('[DELETE] /user/:userId', async () => {
+  test('[DELETE] /user', async () => {
     const user = await userFactory.makePrismaUser({
       email: 'johndoe@email.com',
       password: await hash('123456', 8),
@@ -38,7 +38,7 @@ describe('Delete User (E2E)', () => {
     const accessToken = jwt.sign({ sub: user.id.toString() })
 
     const response = await request(app.getHttpServer())
-      .delete(`/user/${user.id.toString()}`)
+      .delete(`/user`)
       .set('Authorization', `Bearer ${accessToken}`)
       .send()
 

@@ -9,9 +9,13 @@ export abstract class ObjectiveRepository {
     params: PaginationParams
   ): Promise<Objective[]>
   abstract findManyCollaborators(
-    collaborators: User[],
+    objectiveId: string,
     params: PaginationParams
   ): Promise<User[]>
+  abstract deleteCollaborator(
+    objectiveId: string,
+    collaboratorId: string
+  ): Promise<void>
   abstract findManyTasks(
     authorId: string,
     parmas: PaginationParams

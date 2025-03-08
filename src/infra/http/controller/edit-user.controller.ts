@@ -12,6 +12,8 @@ import {
 import { EditUserUseCase } from '@/domain/application/main/User/use-cases/edit-user'
 import { EmailAlreadyExistError } from '@/domain/application/main/User/errors/user-email-already-exist-error'
 import { UsernameAlreadyExistError } from '@/domain/application/main/User/errors/user-username-already.exist'
+import { CurrentUser } from '@/infra/auth/current-user-decorator'
+import { UserPayload } from '@/infra/auth/jwt-strategy'
 
 const editUserBodySchema = z.object({
   name: z.string().nullable(),
@@ -23,7 +25,7 @@ const bodyValidationPipe = new ZodValidationPipe(editUserBodySchema)
 
 type EditUserBodySchema = z.infer<typeof editUserBodySchema>
 
-@Controller('/user/edit/:userId')
+@Controller('/user/edit')
 export class EditUserController {
   constructor(private editUser: EditUserUseCase) {}
 
@@ -31,9 +33,11 @@ export class EditUserController {
   @HttpCode(204)
   async handle(
     @Body(bodyValidationPipe) body: EditUserBodySchema,
-    @Param('userId') userId: string
+    @CurrentUser() user: UserPayload
   ) {
     const { email, name, username } = body
+
+    const userId = user.sub
 
     const result = await this.editUser.execute({
       userId,

@@ -14,6 +14,18 @@ export class InMemoryNotificationsRepository implements NotificationRepository {
     return notification
   }
 
+  async findManyNotifications(recipientId: string): Promise<Notification[]> {
+    const notifications = this.items
+      .filter(
+        (notification) =>
+          notification.recipientId.toString() === recipientId &&
+          !notification.readAt
+      )
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+    return notifications
+  }
+
   async create(notification: Notification) {
     this.items.push(notification)
   }

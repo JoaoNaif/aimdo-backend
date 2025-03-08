@@ -4,6 +4,8 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma.service'
 import { PrismaObjectiveInviteMapper } from '../mappers/prisma-objective-invite-mapper'
 import { DomainEvents } from '@/core/events/domain-events'
+import { PrismaInvitesMapper } from '../mappers/prisma-invites-mapper'
+import { Invites } from '@/domain/enterprise/entities/value-objects/invites'
 
 @Injectable()
 export class PrismaObjectiveInviteRepository
@@ -42,6 +44,20 @@ export class PrismaObjectiveInviteRepository
     }
 
     return PrismaObjectiveInviteMapper.toDomain(objectiveInvite)
+  }
+
+  async findManyInvites(collaboratorId: string): Promise<Invites[]> {
+    const invites = await this.prisma.objectiveInvite.findMany({
+      where: {
+        collaboratorId,
+        status: 'PENDING',
+      },
+      include: {
+        objective: true,
+      },
+    })
+
+    return invites.map(PrismaInvitesMapper.toDomain)
   }
 
   async create(objectiveInvite: ObjectiveInvite): Promise<void> {

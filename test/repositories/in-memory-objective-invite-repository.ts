@@ -1,6 +1,11 @@
+import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 import { DomainEvents } from '@/core/events/domain-events'
 import { ObjectiveInviteRepository } from '@/domain/application/main/_repositories/objective-invite-repository'
 import { ObjectiveInvite } from '@/domain/enterprise/entities/objective-invite'
+import {
+  Invites,
+  InvitesProps,
+} from '@/domain/enterprise/entities/value-objects/invites'
 
 export class InMemoryObjectiveInviteRepository
   implements ObjectiveInviteRepository
@@ -33,6 +38,32 @@ export class InMemoryObjectiveInviteRepository
     }
 
     return objectiveInvite
+  }
+
+  async findManyInvites(collaboratorId: string): Promise<Invites[]> {
+    const invitesDomain = this.items
+      .filter(
+        (invite) =>
+          invite.collaboratorId.toString() === collaboratorId &&
+          invite.status === 'PENDING'
+      )
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+    const invites: Invites[] = invitesDomain.map((invite) =>
+      Invites.create({
+        objectiveId: invite.objectiveId,
+        collaboratorId: invite.collaboratorId,
+        objective: {
+          title: 'test description mock',
+          description: 'Test description mock',
+        },
+        status: invite.status,
+        createdAt: invite.createdAt,
+        updatedAt: invite.updatedAt ?? null,
+      })
+    )
+
+    return invites
   }
 
   async create(objectiveInvite: ObjectiveInvite): Promise<void> {

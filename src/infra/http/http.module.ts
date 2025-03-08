@@ -41,9 +41,24 @@ import { AddCollaboratorsObjectiveController } from './controller/add-collaborat
 import { AddCollaboratorsObjectiveUseCase } from '@/domain/application/main/Objective/use-cases/add-collaborators-objective'
 import { RemoveCollaboratorObjectiveController } from './controller/remove-collaborator-objective.controller'
 import { RemoveCollaboratorObjectiveUseCase } from '@/domain/application/main/Objective/use-cases/remove-collaborator-objective'
+import { FetchCollaboratorsObjectivesController } from './controller/fetch-collaborators-objectives.controller'
+import { FetchCollaboratorsObjectivesUseCase } from '@/domain/application/main/Objective/use-cases/fetch-collaborators-objectives'
+import { DeclineObjectiveInviteController } from './controller/decline-objective-invite.controller'
+import { DeclineObjectiveInviteUseCase } from '@/domain/application/main/Objective/use-cases/decline-objective-invite'
+import { ReadNotificationController } from './controller/read-notification.controller'
+import { ReadNotificationUseCase } from '@/domain/application/notification/application/use-cases/read-notification'
+import { FetchNotificationsController } from './controller/fetch-notification.controller'
+import { FetchNotificationsUseCase } from '@/domain/application/notification/application/use-cases/fetch-notifications'
+import { FetchObjectiveInviteController } from './controller/fetch-objective-invite.controller'
+import { FetchObjectiveInviteUseCase } from '@/domain/application/main/Objective/use-cases/fetch-objective-invite'
+import { EmailModule } from '../email/email.module'
+import { ForgotPasswordController } from './controller/forgot-password.controller'
+import { ForgotPasswordUseCase } from '@/domain/application/main/User/use-cases/forgot-password'
+import { ResetForgotPasswordController } from './controller/reset-forgot-password.controller'
+import { ResetForgotPasswordUseCase } from '@/domain/application/main/User/use-cases/reset-forgot-password'
 
 @Module({
-  imports: [DatabaseModule, CryptographyModule],
+  imports: [DatabaseModule, CryptographyModule, EmailModule],
   controllers: [
     RegisterUserController,
     AuthenticateUserController,
@@ -65,6 +80,13 @@ import { RemoveCollaboratorObjectiveUseCase } from '@/domain/application/main/Ob
     InviteCollaboratorObjectiveController,
     AddCollaboratorsObjectiveController,
     RemoveCollaboratorObjectiveController,
+    FetchCollaboratorsObjectivesController,
+    DeclineObjectiveInviteController,
+    ReadNotificationController,
+    FetchNotificationsController,
+    FetchObjectiveInviteController,
+    ForgotPasswordController,
+    ResetForgotPasswordController,
   ],
   providers: [
     RegisterUserUseCase,
@@ -87,6 +109,13 @@ import { RemoveCollaboratorObjectiveUseCase } from '@/domain/application/main/Ob
     InviteCollaboratorObjectiveUseCase,
     AddCollaboratorsObjectiveUseCase,
     RemoveCollaboratorObjectiveUseCase,
+    FetchCollaboratorsObjectivesUseCase,
+    DeclineObjectiveInviteUseCase,
+    ReadNotificationUseCase,
+    FetchNotificationsUseCase,
+    FetchObjectiveInviteUseCase,
+    ForgotPasswordUseCase,
+    ResetForgotPasswordUseCase,
   ],
 })
 export class HttpModule {}

@@ -29,14 +29,39 @@ export class InMemoryObjectiveRepository implements ObjectiveRepository {
   }
 
   async findManyCollaborators(
-    collaborators: User[],
+    objectiveId: string,
     { page }: PaginationParams
   ): Promise<User[]> {
-    const collaboratorsPagination = collaborators
+    const objective = this.items.find(
+      (item) => item.id.toString() === objectiveId
+    )
+
+    if (!objective) {
+      return []
+    }
+
+    const collaboratorsPagination = objective.collaborators
       .sort()
       .slice((page - 1) * 20, page * 20)
 
     return collaboratorsPagination
+  }
+
+  async deleteCollaborator(
+    objectiveId: string,
+    collaboratorId: string
+  ): Promise<void> {
+    const objective = this.items.find(
+      (item) => item.id.toString() === objectiveId
+    )
+
+    if (!objective) {
+      return
+    }
+
+    objective.collaborators = objective.collaborators.filter(
+      (collaborator) => collaborator.id.toString() !== collaboratorId
+    )
   }
 
   async findManyTasks(

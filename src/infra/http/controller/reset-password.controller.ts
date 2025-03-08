@@ -13,6 +13,8 @@ import {
 import { ResetPasswordUserUseCase } from '@/domain/application/main/User/use-cases/reset-password-user'
 import { ConfirmPasswordCredentialsError } from '@/domain/application/main/User/errors/confirm-password-credentials-error'
 import { OldPasswordCredentialsError } from '@/domain/application/main/User/errors/old-password-credentials-error'
+import { CurrentUser } from '@/infra/auth/current-user-decorator'
+import { UserPayload } from '@/infra/auth/jwt-strategy'
 
 const resetPasswordBodySchema = z.object({
   oldPassword: z.string(),
@@ -24,7 +26,7 @@ const bodyValidationPipe = new ZodValidationPipe(resetPasswordBodySchema)
 
 type ResetPasswordBodySchema = z.infer<typeof resetPasswordBodySchema>
 
-@Controller('/user/password-reset/:userId')
+@Controller('/user/password-reset')
 export class ResetPasswordController {
   constructor(private resetPassword: ResetPasswordUserUseCase) {}
 
@@ -32,9 +34,11 @@ export class ResetPasswordController {
   @HttpCode(204)
   async handle(
     @Body(bodyValidationPipe) body: ResetPasswordBodySchema,
-    @Param('userId') userId: string
+    @CurrentUser() user: UserPayload
   ) {
     const { confirmNewPassword, newPassword, oldPassword } = body
+
+    const userId = user.sub
 
     const result = await this.resetPassword.execute({
       userId,

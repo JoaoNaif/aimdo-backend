@@ -31,6 +31,12 @@ export class PrismaObjectiveMapper {
       authorId: objective.authorId.toString(),
       dueDate: objective.dueDate,
       completedDate: objective.completedDate,
+      collaborators: {
+        connect:
+          objective.collaborators.map((collaborator) => ({
+            id: collaborator.id.toString(),
+          })) || [],
+      },
       createdAt: objective.createdAt,
     }
   }

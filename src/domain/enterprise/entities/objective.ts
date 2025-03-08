@@ -77,6 +77,10 @@ export class Objective extends Entity<ObjectiveProps> {
     this.props.category = category
   }
 
+  set collaborators(collaborators: User[]) {
+    this.props.collaborators = collaborators
+  }
+
   set completedDate(completedDate: Date | null | undefined) {
     this.props.completedDate = completedDate
   }

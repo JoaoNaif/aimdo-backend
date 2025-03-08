@@ -72,6 +72,10 @@ export class DomainEvents {
 
     const isEventRegistered = eventClassName in this.handlersMap
 
+    if (!this.shouldRun) {
+      return
+    }
+
     if (isEventRegistered) {
       const handlers = this.handlersMap[eventClassName]
 

@@ -5,10 +5,15 @@ import { User } from '@/domain/enterprise/entities/user'
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma.service'
 import { PrismaObjectiveMapper } from '../mappers/prisma-objective-mapper'
+import { PrismaUserMapper } from '../mappers/prisma-user-mapper'
+import { CacheRepository } from '@/infra/cache/cache-repository'
 
 @Injectable()
 export class PrismaObjectiveRepository implements ObjectiveRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cache: CacheRepository
+  ) {}
 
   async findById(id: string): Promise<Objective | null> {
     const objective = await this.prisma.objective.findUnique({
@@ -43,16 +48,59 @@ export class PrismaObjectiveRepository implements ObjectiveRepository {
   }
 
   async findManyCollaborators(
-    collaborators: User[],
+    objectiveId: string,
     { page }: PaginationParams
   ): Promise<User[]> {
-    return collaborators.sort().slice((page - 1) * 20, page * 20)
+    const objectiveWithCollaborator = await this.prisma.objective.findUnique({
+      where: { id: objectiveId },
+      include: { collaborators: true },
+    })
+
+    if (!objectiveWithCollaborator) {
+      return []
+    }
+
+    const collaborators = objectiveWithCollaborator.collaborators
+      .sort()
+      .slice((page - 1) * 20, page * 20)
+
+    return collaborators.map(PrismaUserMapper.toDomain)
+  }
+
+  async deleteCollaborator(
+    objectiveId: string,
+    collaboratorId: string
+  ): Promise<void> {
+    const objective = await this.prisma.objective.findUnique({
+      where: { id: objectiveId },
+      include: { collaborators: true },
+    })
+
+    if (!objective) {
+      return
+    }
+
+    await this.prisma.objective.update({
+      where: { id: objectiveId },
+      data: {
+        collaborators: {
+          disconnect: { id: collaboratorId },
+        },
+      },
+    })
   }
 
   async findManyTasks(
     authorId: string,
     { page }: PaginationParams
   ): Promise<Objective[]> {
+    const cacheKey = `objectives:authorId:${authorId}:category:TASK:page:${page}`
+
+    const cachedData = await this.cache.get(cacheKey)
+    if (cachedData) {
+      return JSON.parse(cachedData)
+    }
+
     const tasks = await this.prisma.objective.findMany({
       where: {
         authorId,
@@ -65,13 +113,24 @@ export class PrismaObjectiveRepository implements ObjectiveRepository {
       skip: (page - 1) * 20,
     })
 
-    return tasks.map(PrismaObjectiveMapper.toDomain)
+    const domainTask = tasks.map(PrismaObjectiveMapper.toDomain)
+
+    await this.cache.set(cacheKey, JSON.stringify(domainTask))
+
+    return domainTask
   }
 
   async findManyGoals(
     authorId: string,
     { page }: PaginationParams
   ): Promise<Objective[]> {
+    const cacheKey = `objectives:authorId:${authorId}:category:GOAL:page:${page}`
+
+    const cachedData = await this.cache.get(cacheKey)
+    if (cachedData) {
+      return JSON.parse(cachedData)
+    }
+
     const goals = await this.prisma.objective.findMany({
       where: {
         authorId,
@@ -84,13 +143,24 @@ export class PrismaObjectiveRepository implements ObjectiveRepository {
       skip: (page - 1) * 20,
     })
 
-    return goals.map(PrismaObjectiveMapper.toDomain)
+    const domainGoal = goals.map(PrismaObjectiveMapper.toDomain)
+
+    await this.cache.set(cacheKey, JSON.stringify(domainGoal))
+
+    return domainGoal
   }
 
   async findManyBuys(
     authorId: string,
     { page }: PaginationParams
   ): Promise<Objective[]> {
+    const cacheKey = `objectives:authorId:${authorId}:category:BUY:page:${page}`
+
+    const cachedData = await this.cache.get(cacheKey)
+    if (cachedData) {
+      return JSON.parse(cachedData)
+    }
+
     const buys = await this.prisma.objective.findMany({
       where: {
         authorId,
@@ -103,7 +173,11 @@ export class PrismaObjectiveRepository implements ObjectiveRepository {
       skip: (page - 1) * 20,
     })
 
-    return buys.map(PrismaObjectiveMapper.toDomain)
+    const domainBuys = buys.map(PrismaObjectiveMapper.toDomain)
+
+    await this.cache.set(cacheKey, JSON.stringify(domainBuys))
+
+    return domainBuys
   }
 
   async create(objective: Objective): Promise<void> {
@@ -112,6 +186,10 @@ export class PrismaObjectiveRepository implements ObjectiveRepository {
     await this.prisma.objective.create({
       data,
     })
+
+    await this.cache.deleteMany(
+      `objectives:authorId:${objective.authorId}:category:${objective.category}:*`
+    )
   }
   async save(objective: Objective): Promise<void> {
     const data = PrismaObjectiveMapper.toPrisma(objective)
@@ -122,6 +200,10 @@ export class PrismaObjectiveRepository implements ObjectiveRepository {
       },
       data,
     })
+
+    await this.cache.deleteMany(
+      `objectives:authorId:${objective.authorId}:category:${objective.category}:*`
+    )
   }
 
   async delete(objective: Objective): Promise<void> {

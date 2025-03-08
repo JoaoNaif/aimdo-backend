@@ -4,7 +4,6 @@ import { BadRequestException, Controller, Get, Query } from '@nestjs/common'
 import { CurrentUser } from '@/infra/auth/current-user-decorator'
 import { UserPayload } from '@/infra/auth/jwt-strategy'
 import { ObjectivesPresenter } from '../presenters/objectives-presenter'
-import { FetchGoalsObjectivesUseCase } from '@/domain/application/main/Objective/use-cases/fetch-goals-objectives'
 import { FetchBuysObjectivesUseCase } from '@/domain/application/main/Objective/use-cases/fetch-buys-objectives'
 
 const pageQueryParamSchema = z

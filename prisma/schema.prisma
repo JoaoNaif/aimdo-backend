@@ -40,11 +40,25 @@ model User {
   password  String
   createdAt DateTime @default(now()) @map("created_at")
 
-  objectives      Objective[]
-  ObjectiveInvite ObjectiveInvite[]
-  Notification    Notification[]
+  objectives              Objective[]
+  ObjectiveInvite         ObjectiveInvite[]
+  Notification            Notification[]
+  collaborativeObjectives Objective[]          @relation("CollaborativeObjectives")
+  PasswordResetToken      PasswordResetToken[]
 
   @@map("users")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime @map("expires_at")
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("password_reset_tokens")
 }
 
 model Objective {
@@ -61,6 +75,7 @@ model Objective {
 
   author          User              @relation(fields: [authorId], references: [id])
   ObjectiveInvite ObjectiveInvite[]
+  collaborators   User[]            @relation("CollaborativeObjectives")
 
   @@map("objectives")
 }

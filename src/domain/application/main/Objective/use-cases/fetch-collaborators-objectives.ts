@@ -4,7 +4,9 @@ import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-e
 import { FetchCollaboratorsObjectivesUseCaseRequest } from '../request/fetch-collaborators-objectives-request'
 import { FetchCollaboratorsObjectivesUseCaseResponse } from '../response/fetch-collaborators-objectives'
 import { Collaborator } from '@/core/types/collaborator'
+import { Injectable } from '@nestjs/common'
 
+@Injectable()
 export class FetchCollaboratorsObjectivesUseCase {
   constructor(private objectiveRepository: ObjectiveRepository) {}
 
@@ -19,7 +21,7 @@ export class FetchCollaboratorsObjectivesUseCase {
     }
 
     const users = await this.objectiveRepository.findManyCollaborators(
-      objective.collaborators,
+      objective.id.toString(),
       { page }
     )
 

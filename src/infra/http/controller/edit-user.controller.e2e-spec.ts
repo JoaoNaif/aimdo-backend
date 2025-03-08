@@ -29,7 +29,7 @@ describe('Put User (E2E)', () => {
     await app.init()
   })
 
-  test('[PUT] /user/:userId', async () => {
+  test('[PUT] /user/edit', async () => {
     const user = await userFactory.makePrismaUser({
       email: 'johndoe@email.com',
       name: 'John Doe',
@@ -38,10 +38,8 @@ describe('Put User (E2E)', () => {
 
     const accessToken = jwt.sign({ sub: user.id.toString() })
 
-    const userId = user.id.toString()
-
     const response = await request(app.getHttpServer())
-      .put(`/user/edit/${userId}`)
+      .put(`/user/edit`)
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         email: 'fulano@gmail.com',

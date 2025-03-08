@@ -13,7 +13,10 @@ describe('Remove Collaborator Objective', () => {
   beforeEach(() => {
     inMemoryUserRepository = new InMemoryUserRepository()
     inMemoryObjectiveRepository = new InMemoryObjectiveRepository()
-    sut = new RemoveCollaboratorObjectiveUseCase(inMemoryObjectiveRepository)
+    sut = new RemoveCollaboratorObjectiveUseCase(
+      inMemoryObjectiveRepository,
+      inMemoryUserRepository
+    )
   })
 
   it('should be able to remove a collaborator in objective', async () => {

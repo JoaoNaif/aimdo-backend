@@ -5,7 +5,9 @@ import { DeclineObjectiveInviteUseCaseRequest } from '../request/decline-objecti
 import { DeclineObjectiveInviteUseCaseResponse } from '../response/decline-objective-invite-response'
 import { ObjectiveInviteRepository } from '../../_repositories/objective-invite-repository'
 import { UserRepository } from '../../_repositories/user-repository'
+import { Injectable } from '@nestjs/common'
 
+@Injectable()
 export class DeclineObjectiveInviteUseCase {
   constructor(
     private objectiveInviteRepository: ObjectiveInviteRepository,
@@ -29,7 +31,7 @@ export class DeclineObjectiveInviteUseCase {
       return left(new ResourceNotFoundError())
     }
 
-    if (objectiveInvite.collaboratorId !== user.id) {
+    if (objectiveInvite.collaboratorId.toString() !== user.id.toString()) {
       return left(new UnauthorizedError())
     }
 

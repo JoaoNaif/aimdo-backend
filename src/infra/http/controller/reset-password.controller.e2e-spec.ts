@@ -29,7 +29,7 @@ describe('Reset Password (E2E)', () => {
     await app.init()
   })
 
-  test('[PUT] /user/password-reset/:userId', async () => {
+  test('[PUT] /user/password-reset', async () => {
     const user = await userFactory.makePrismaUser({
       email: 'johndoe@email.com',
       name: 'John Doe',
@@ -41,7 +41,7 @@ describe('Reset Password (E2E)', () => {
     const userId = user.id.toString()
 
     const response = await request(app.getHttpServer())
-      .put(`/user/password-reset/${userId}`)
+      .put(`/user/password-reset`)
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         oldPassword: '123456',

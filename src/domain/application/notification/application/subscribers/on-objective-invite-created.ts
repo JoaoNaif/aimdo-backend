@@ -43,17 +43,19 @@ export class OnObjectiveInviteCreated implements EventHandler {
     )
 
     if (!user) {
-      throw new Error('user')
+      throw new Error('Not found user')
     }
 
-    if (collaborator) {
-      await this.sendNotification.execute({
-        recipientId: collaborator.id.toString(),
-        title: `Novo convite de ${user.name.substring(0, 40).concat('...')}`,
-        content: `Você foi convidado a participar do objetivo "${objective.title
-          .substring(0, 120)
-          .concat('...')}"`,
-      })
+    if (!collaborator) {
+      throw new Error('Not found collaborator')
     }
+
+    await this.sendNotification.execute({
+      recipientId: collaborator.id.toString(),
+      title: `Novo convite de ${user.name.substring(0, 40).concat('...')}`,
+      content: `Você foi convidado a participar do objetivo "${objective.title
+        .substring(0, 120)
+        .concat('...')}"`,
+    })
   }
 }

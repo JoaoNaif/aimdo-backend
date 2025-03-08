@@ -3,12 +3,35 @@ import { User } from '@/domain/enterprise/entities/user'
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma.service'
 import { PrismaUserMapper } from '../mappers/prisma-user-mapper'
+import { CacheRepository } from '@/infra/cache/cache-repository'
+import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cache: CacheRepository
+  ) {}
 
   async findById(id: string): Promise<User | null> {
+    const cacheKey = `user:${id}:details`
+    const cacheHit = await this.cache.get(cacheKey)
+
+    if (cacheHit) {
+      const cacheData = JSON.parse(cacheHit)
+
+      return User.create(
+        {
+          name: cacheData.props.name,
+          username: cacheData.props.username,
+          email: cacheData.props.email,
+          password: cacheData.props.password,
+          createdAt: new Date(cacheData.props.createdAt),
+        },
+        new UniqueEntityId(cacheData._id.value)
+      )
+    }
+
     const user = await this.prisma.user.findUnique({
       where: {
         id,
@@ -19,7 +42,11 @@ export class PrismaUserRepository implements UserRepository {
       return null
     }
 
-    return PrismaUserMapper.toDomain(user)
+    const userDetails = PrismaUserMapper.toDomain(user)
+
+    await this.cache.set(cacheKey, JSON.stringify(userDetails))
+
+    return userDetails
   }
 
   async findByUsername(username: string): Promise<User | null> {
@@ -61,12 +88,16 @@ export class PrismaUserRepository implements UserRepository {
   async save(user: User): Promise<void> {
     const data = PrismaUserMapper.toPrisma(user)
 
-    await this.prisma.user.update({
-      where: {
-        id: data.id,
-      },
-      data,
-    })
+    await Promise.all([
+      this.prisma.user.update({
+        where: {
+          id: data.id,
+        },
+        data,
+      }),
+
+      this.cache.delete(`user:${data.id?.toString()}:details`),
+    ])
   }
 
   async delete(user: User): Promise<void> {

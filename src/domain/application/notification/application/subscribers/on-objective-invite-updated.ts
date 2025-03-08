@@ -42,12 +42,18 @@ export class OnObjectiveInviteUpdated implements EventHandler {
       objectiveInvite.collaboratorId.toString()
     )
 
-    if (author && collaborator) {
-      await this.sendNotification.execute({
-        recipientId: author.id.toString(),
-        title: `${collaborator.name} aceitou o convite`,
-        content: `O convite foi aceito para o objetivo ${objective.title.substring(0, 40).concat('...')}`,
-      })
+    if (!author) {
+      throw new Error('Not found Author')
     }
+
+    if (!collaborator) {
+      throw new Error('Not found Collaborator')
+    }
+
+    await this.sendNotification.execute({
+      recipientId: author.id.toString(),
+      title: `${collaborator.name} ${objectiveInvite.status === 'ACCEPTED' ? 'aceitou' : 'negou'} o convite`,
+      content: `O convite foi ${objectiveInvite.status === 'ACCEPTED' ? 'aceito' : 'negado'} para o objetivo ${objective.title.substring(0, 40).concat('...')}`,
+    })
   }
 }

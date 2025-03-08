@@ -5,10 +5,14 @@ import { RemoveCollaboratorObjectiveUseCaseRequest } from '../request/remove-col
 import { RemoveCollaboratorObjectiveUseCaseResponse } from '../response/remove-collaborator-objective-response'
 import { UnauthorizedError } from '@/core/errors/errors/unauthorized-error'
 import { Injectable } from '@nestjs/common'
+import { UserRepository } from '../../_repositories/user-repository'
 
 @Injectable()
 export class RemoveCollaboratorObjectiveUseCase {
-  constructor(private objectiveRepository: ObjectiveRepository) {}
+  constructor(
+    private objectiveRepository: ObjectiveRepository,
+    private userRepository: UserRepository
+  ) {}
 
   async execute({
     objectiveId,
@@ -25,13 +29,16 @@ export class RemoveCollaboratorObjectiveUseCase {
       return left(new UnauthorizedError())
     }
 
-    const collaboratorIndex = objective.collaborators.findIndex(
-      (item) => item.id.toString() === collaboratorId
+    const collaborator = await this.userRepository.findById(collaboratorId)
+
+    if (!collaborator) {
+      return left(new ResourceNotFoundError())
+    }
+
+    await this.objectiveRepository.deleteCollaborator(
+      objective.id.toString(),
+      collaborator.id.toString()
     )
-
-    objective.collaborators.splice(collaboratorIndex, 1)
-
-    await this.objectiveRepository.save(objective)
 
     return right(null)
   }
