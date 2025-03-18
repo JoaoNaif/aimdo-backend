@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { ZodValidationPipe } from '../pipes/zod-validation-pipe'
 import { UsernameAlreadyExistError } from '@/domain/application/main/User/errors/user-username-already.exist'
 import { EmailAlreadyExistError } from '@/domain/application/main/User/errors/user-email-already-exist-error'
+import { UserPresenter } from '../presenters/user-presenter'
 
 const registerUserBodySchema = z.object({
   username: z.string(),

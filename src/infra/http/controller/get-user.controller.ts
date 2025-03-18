@@ -1,8 +1,15 @@
 import { GetUserUseCase } from '@/domain/application/main/User/use-cases/get-user'
-import { BadRequestException, Controller, Get, Param } from '@nestjs/common'
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+} from '@nestjs/common'
 import { UserPresenter } from '../presenters/user-presenter'
 import { CurrentUser } from '@/infra/auth/current-user-decorator'
 import { UserPayload } from '@/infra/auth/jwt-strategy'
+import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found-error'
 
 @Controller('/user')
 export class GetUserContoller {
@@ -17,7 +24,14 @@ export class GetUserContoller {
     })
 
     if (result.isLeft()) {
-      throw new BadRequestException()
+      const error = result.value
+
+      switch (error.constructor) {
+        case ResourceNotFoundError:
+          throw new NotFoundException(error.message)
+        default:
+          throw new BadRequestException(error.message)
+      }
     }
 
     return {
