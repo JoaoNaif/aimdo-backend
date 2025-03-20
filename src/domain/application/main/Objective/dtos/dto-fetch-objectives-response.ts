@@ -6,5 +6,6 @@ export interface DTOFetchObjectivesResponse {
   urgency: 'HIGH' | 'MEDIUM' | 'LOW'
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELED'
   category: 'TASK' | 'BUY' | 'GOAL'
+  dueDate: Date | null | undefined
   createdAt: Date
 }

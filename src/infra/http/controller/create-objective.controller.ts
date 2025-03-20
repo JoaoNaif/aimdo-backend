@@ -10,7 +10,10 @@ const createObjectiveBodySchema = z.object({
   description: z.string(),
   urgency: z.enum(['HIGH', 'MEDIUM', 'LOW']),
   category: z.enum(['TASK', 'BUY', 'GOAL']),
-  dueDate: z.date().nullable().optional(),
+  dueDate: z.preprocess(
+    (val) => (val === null ? null : new Date(val as string)),
+    z.date().nullable()
+  ),
 })
 
 const bodyValidationPipe = new ZodValidationPipe(createObjectiveBodySchema)

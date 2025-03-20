@@ -23,6 +23,7 @@ export class FetchGoalsObjectivesUseCase {
       category: obj.category,
       status: obj.status,
       urgency: obj.urgency,
+      dueDate: obj.dueDate,
       createdAt: obj.createdAt,
     }))
 

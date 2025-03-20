@@ -8,6 +8,7 @@ export class ObjectivesPresenter {
       urgency: objectives.urgency,
       status: objectives.status,
       category: objectives.category,
+      dueDate: objectives.dueDate,
       createdAt: objectives.createdAt,
     }
   }
