@@ -30,7 +30,7 @@ export class FetchObjectivesUseCase {
     )
 
     const objectives: DTOFetchObjectivesResponse[] = objective.map((obj) => ({
-      id: obj.id,
+      id: obj.id.toString(),
       title: obj.title,
       category: obj.category,
       status: obj.status,

@@ -17,8 +17,20 @@ export class FetchBuysObjectivesUseCase {
       page,
     })
 
+    console.log('antes do dto: ', objectives)
+
+    objectives.forEach((obj) => {
+      console.log('ID:', obj.id)
+      console.log('Title:', obj.title)
+      console.log('Category:', obj.category)
+      console.log('Status:', obj.status)
+      console.log('Urgency:', obj.urgency)
+      console.log('Due Date:', obj.dueDate)
+      console.log('Created At:', obj.createdAt)
+    })
+
     const buys: DTOFetchObjectivesResponse[] = objectives.map((obj) => ({
-      id: obj.id,
+      id: obj.id.toString(),
       title: obj.title,
       category: obj.category,
       status: obj.status,
@@ -26,6 +38,8 @@ export class FetchBuysObjectivesUseCase {
       dueDate: obj.dueDate,
       createdAt: obj.createdAt,
     }))
+
+    console.log('depois do dto', buys)
 
     return right({
       buys,

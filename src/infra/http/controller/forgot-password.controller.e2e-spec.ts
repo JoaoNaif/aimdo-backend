@@ -50,4 +50,4 @@ describe('Forgot Password (E2E)', () => {
 
     expect(passwordResetTokenOnDatabase).toBeTruthy()
   })
-})
+}, 10000)

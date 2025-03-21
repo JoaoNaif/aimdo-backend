@@ -3,7 +3,7 @@ import { DTOFetchObjectivesResponse } from '@/domain/application/main/Objective/
 export class ObjectivesPresenter {
   static toHTTP(objectives: DTOFetchObjectivesResponse) {
     return {
-      id: objectives.id.toString(),
+      id: objectives.id,
       title: objectives.title,
       urgency: objectives.urgency,
       status: objectives.status,

@@ -7,6 +7,8 @@ import { PrismaService } from '../prisma.service'
 import { PrismaObjectiveMapper } from '../mappers/prisma-objective-mapper'
 import { PrismaUserMapper } from '../mappers/prisma-user-mapper'
 import { CacheRepository } from '@/infra/cache/cache-repository'
+import { DTOFetchObjectivesResponse } from '@/domain/application/main/Objective/dtos/dto-fetch-objectives-response'
+import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 
 @Injectable()
 export class PrismaObjectiveRepository implements ObjectiveRepository {
@@ -96,9 +98,30 @@ export class PrismaObjectiveRepository implements ObjectiveRepository {
   ): Promise<Objective[]> {
     const cacheKey = `objectives:authorId:${authorId}:category:TASK:page:${page}`
 
-    const cachedData = await this.cache.get(cacheKey)
-    if (cachedData) {
-      return JSON.parse(cachedData)
+    const cacheHit = await this.cache.get(cacheKey)
+
+    if (cacheHit) {
+      const cacheData = JSON.parse(cacheHit)
+
+      return cacheData.map((i) =>
+        Objective.create(
+          {
+            title: i.props.title,
+            description: i.props.description,
+            category: i.props.category,
+            urgency: i.props.urgency,
+            status: i.props.status,
+            dueDate: i.props.dueDate ? new Date(i.props.dueDate) : null,
+            completedDate: i.props.completedDate
+              ? new Date(i.props.completedDate)
+              : null,
+            createdAt: new Date(i.props.createdAt),
+            authorId: new UniqueEntityId(i.props.authorId.value),
+            collaborators: i.props.collaborators ?? [],
+          },
+          new UniqueEntityId(i._id.value)
+        )
+      )
     }
 
     const tasks = await this.prisma.objective.findMany({
@@ -126,9 +149,30 @@ export class PrismaObjectiveRepository implements ObjectiveRepository {
   ): Promise<Objective[]> {
     const cacheKey = `objectives:authorId:${authorId}:category:GOAL:page:${page}`
 
-    const cachedData = await this.cache.get(cacheKey)
-    if (cachedData) {
-      return JSON.parse(cachedData)
+    const cacheHit = await this.cache.get(cacheKey)
+
+    if (cacheHit) {
+      const cacheData = JSON.parse(cacheHit)
+
+      return cacheData.map((i) =>
+        Objective.create(
+          {
+            title: i.props.title,
+            description: i.props.description,
+            category: i.props.category,
+            urgency: i.props.urgency,
+            status: i.props.status,
+            dueDate: i.props.dueDate ? new Date(i.props.dueDate) : null,
+            completedDate: i.props.completedDate
+              ? new Date(i.props.completedDate)
+              : null,
+            createdAt: new Date(i.props.createdAt),
+            authorId: new UniqueEntityId(i.props.authorId.value),
+            collaborators: i.props.collaborators ?? [],
+          },
+          new UniqueEntityId(i._id.value)
+        )
+      )
     }
 
     const goals = await this.prisma.objective.findMany({
@@ -156,9 +200,30 @@ export class PrismaObjectiveRepository implements ObjectiveRepository {
   ): Promise<Objective[]> {
     const cacheKey = `objectives:authorId:${authorId}:category:BUY:page:${page}`
 
-    const cachedData = await this.cache.get(cacheKey)
-    if (cachedData) {
-      return JSON.parse(cachedData)
+    const cacheHit = await this.cache.get(cacheKey)
+
+    if (cacheHit) {
+      const cacheData = JSON.parse(cacheHit)
+
+      return cacheData.map((i) =>
+        Objective.create(
+          {
+            title: i.props.title,
+            description: i.props.description,
+            category: i.props.category,
+            urgency: i.props.urgency,
+            status: i.props.status,
+            dueDate: i.props.dueDate ? new Date(i.props.dueDate) : null,
+            completedDate: i.props.completedDate
+              ? new Date(i.props.completedDate)
+              : null,
+            createdAt: new Date(i.props.createdAt),
+            authorId: new UniqueEntityId(i.props.authorId.value),
+            collaborators: i.props.collaborators ?? [],
+          },
+          new UniqueEntityId(i._id.value)
+        )
+      )
     }
 
     const buys = await this.prisma.objective.findMany({
